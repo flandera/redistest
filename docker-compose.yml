@@ -1,0 +1,25 @@
+---
+version: '3'
+services:
+
+  php:
+    image: webdevops/php-apache-dev:7.1
+    environment: ['WEB_DOCUMENT_ROOT=/var/www/redis_test/www', 'WEB_DOCUMENT_INDEX=/var/www/redis_test/www/index.php', 'PHP_DEBUGGER=xdebug', 'XDEBUG_REMOTE_AUTOSTART=0', 'XDEBUG_REMOTE_ENABLE=1', 'XDEBUG_REMOTE_CONNECT_BACK=0', 'XDEBUG_REMOTE_HOST=152.146.136.254', 'XDEBUG_REMOTE_PORT=9001', 'XDEBUG_IDEKEY=PHPSTORM']
+    volumes:
+        - ./:/var/www/redis_test:rw
+    ports: ['127.0.0.1:8085:80']
+    depends_on: ['redis']
+    networks: ['stack']
+
+  redis:
+    image: redis
+    networks: ['stack']
+
+  composer:
+    image: composer/composer:php7
+    command: install
+    volumes:
+      - ./:/app:rw
+    networks: ['stack']
+
+networks: {stack: {}}
