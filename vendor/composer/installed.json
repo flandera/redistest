@@ -32,7 +32,7 @@
             "ext-mbstring": "to use Strings::lower() etc...",
             "ext-xml": "to use Strings::length() etc. when mbstring is not available"
         },
-        "time": "2018-02-19T14:42:42+00:00",
+        "time": "2018-02-19 14:42:42",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -109,7 +109,7 @@
             "nette/tester": "^2.0",
             "tracy/tracy": "^2.3"
         },
-        "time": "2017-07-10T23:47:08+00:00",
+        "time": "2017-07-10 23:47:08",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -173,7 +173,7 @@
         "suggest": {
             "ext-pdo_sqlite": "to use SQLiteStorage or SQLiteJournal"
         },
-        "time": "2018-03-21T11:04:32+00:00",
+        "time": "2018-03-21 11:04:32",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -241,7 +241,7 @@
             "nette/tester": "^2.0",
             "tracy/tracy": "^2.4"
         },
-        "time": "2017-07-11T19:28:57+00:00",
+        "time": "2017-07-11 19:28:57",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -309,7 +309,7 @@
             "ext-fileinfo": "to detect type of uploaded files",
             "nette/security": "allows use Nette\\Http\\UserStorage"
         },
-        "time": "2018-03-14T18:55:13+00:00",
+        "time": "2018-03-14 18:55:13",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -379,7 +379,7 @@
             "nette/tester": "^2.0",
             "tracy/tracy": "^2.3"
         },
-        "time": "2018-03-20T16:32:50+00:00",
+        "time": "2018-03-20 16:32:50",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -457,7 +457,7 @@
             "latte/latte": "Allows using Latte in templates",
             "nette/forms": "Allows to use Nette\\Application\\UI\\Form"
         },
-        "time": "2018-03-07T16:04:13+00:00",
+        "time": "2018-03-07 16:04:13",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -530,7 +530,7 @@
             "nette/tester": "^2.0",
             "tracy/tracy": "^2.3"
         },
-        "time": "2017-07-14T07:06:27+00:00",
+        "time": "2017-07-14 07:06:27",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -586,7 +586,7 @@
             "nette/tester": "~2.0",
             "tracy/tracy": "^2.3"
         },
-        "time": "2017-07-11T18:29:08+00:00",
+        "time": "2017-07-11 18:29:08",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -648,7 +648,7 @@
             "nette/tester": "^2.0",
             "tracy/tracy": "^2.3"
         },
-        "time": "2018-03-28T23:53:36+00:00",
+        "time": "2018-03-28 23:53:36",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -730,7 +730,7 @@
             "nette/robot-loader": "to use Configurator::createRobotLoader()",
             "tracy/tracy": "to use Configurator::enableTracy()"
         },
-        "time": "2017-08-20T17:36:59+00:00",
+        "time": "2017-08-20 17:36:59",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -797,7 +797,7 @@
             "nette/tester": "^2.0",
             "tracy/tracy": "^2.4"
         },
-        "time": "2018-02-05T18:46:36+00:00",
+        "time": "2018-02-05 18:46:36",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -871,7 +871,7 @@
             "nette/tester": "~2.0",
             "tracy/tracy": "^2.4"
         },
-        "time": "2018-03-07T16:29:18+00:00",
+        "time": "2018-03-07 16:29:18",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -942,7 +942,7 @@
         "suggest": {
             "ext-fileinfo": "to detect type of attached files"
         },
-        "time": "2018-03-18T16:30:02+00:00",
+        "time": "2018-03-18 16:30:02",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1009,7 +1009,7 @@
             "nette/tester": "^2.0",
             "tracy/tracy": "^2.3"
         },
-        "time": "2017-09-26T13:42:21+00:00",
+        "time": "2017-09-26 13:42:21",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1073,7 +1073,7 @@
             "nette/tester": "~1.7",
             "tracy/tracy": "^2.3"
         },
-        "time": "2017-07-13T18:20:37+00:00",
+        "time": "2017-07-13 18:20:37",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1139,7 +1139,7 @@
             "nette/tester": "~2.0",
             "tracy/tracy": "^2.4"
         },
-        "time": "2018-04-02T19:47:47+00:00",
+        "time": "2018-04-02 19:47:47",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1209,7 +1209,7 @@
             "ext-mbstring": "to use filters like lower, upper, capitalize, ...",
             "nette/utils": "to use filter |webalize"
         },
-        "time": "2018-02-06T14:42:33+00:00",
+        "time": "2018-02-06 14:42:33",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1278,7 +1278,7 @@
         "suggest": {
             "https://nette.org/donate": "Please support Tracy via a donation"
         },
-        "time": "2018-03-23T17:15:58+00:00",
+        "time": "2018-03-23 17:15:58",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1333,7 +1333,7 @@
             "reference": "0602f6020afb77dae5a4ae50d7135f3fbe3e22cf",
             "shasum": ""
         },
-        "time": "2018-02-21T15:58:44+00:00",
+        "time": "2018-02-21 15:58:44",
         "type": "library",
         "installation-source": "dist",
         "notification-url": "https://packagist.org/downloads/",
@@ -1367,7 +1367,7 @@
         "require": {
             "php": ">=5.6.0"
         },
-        "time": "2018-02-07T12:55:20+00:00",
+        "time": "2018-02-07 12:55:20",
         "bin": [
             "src/tester"
         ],
@@ -1462,7 +1462,7 @@
         "suggest": {
             "ext-redis": "The php redis extension https://github.com/nicolasff/phpredis/ is required for connecting to redis server"
         },
-        "time": "2017-12-04T15:04:20+00:00",
+        "time": "2017-12-04 15:04:20",
         "type": "library",
         "extra": {
             "branch-alias": {

@@ -15,6 +15,13 @@ services:
     image: redis
     networks: ['stack']
 
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    restart: always
+    environment: ['REDIS_HOSTS=local:redis:6379']
+    ports: ['127.0.0.1:8081:8081']
+    networks: ['stack']
+
   composer:
     image: composer/composer:php7
     command: install
