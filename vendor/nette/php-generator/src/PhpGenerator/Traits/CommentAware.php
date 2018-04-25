@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\PhpGenerator\Traits;
 
 
@@ -16,6 +18,18 @@ trait CommentAware
 	/** @var string|null */
 	private $comment;
 
+
+	/**
+	 * @param  string|null  $val
+	 * @return static
+	 */
+	public function setComment($val): self
+	{
+		$this->comment = $val ? (string) $val : null;
+		return $this;
+	}
+
+
 	/**
 	 * @return string|null
 	 */
@@ -24,42 +38,11 @@ trait CommentAware
 		return $this->comment;
 	}
 
-	/**
-	 * @param  string|null
-	 * @return static
-	 */
-	public function setComment($val)
-	{
-		$this->comment = $val ? (string) $val : null;
-		return $this;
-	}
-
-	/** @deprecated */
-	public function setDocuments(array $s)
-	{
-		trigger_error(__METHOD__ . '() is deprecated, use similar setComment()', E_USER_DEPRECATED);
-		return $this->setComment(implode("\n", $s));
-	}
-
-	/** @deprecated */
-	public function getDocuments()
-	{
-		trigger_error(__METHOD__ . '() is deprecated, use similar getComment()', E_USER_DEPRECATED);
-		return $this->comment ? [$this->comment] : [];
-	}
-
-	/** @deprecated */
-	public function addDocument($s)
-	{
-		trigger_error(__METHOD__ . '() is deprecated, use addComment()', E_USER_DEPRECATED);
-		return $this->addComment($s);
-	}
 
 	/**
-	 * @param  string
 	 * @return static
 	 */
-	public function addComment($val)
+	public function addComment(string $val): self
 	{
 		$this->comment .= $this->comment ? "\n$val" : $val;
 		return $this;

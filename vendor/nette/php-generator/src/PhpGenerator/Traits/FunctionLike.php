@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\PhpGenerator\Traits;
 
 use Nette;
@@ -39,47 +41,38 @@ trait FunctionLike
 	/** @var PhpNamespace|null */
 	private $namespace;
 
-	/**
-	 * @return string
-	 */
-	public function getBody()
-	{
-		return $this->body;
-	}
 
 	/**
-	 * @param  string
 	 * @return static
 	 */
-	public function setBody($code, array $args = null)
+	public function setBody(string $code, array $args = null): self
 	{
 		$this->body = $args === null ? $code : Helpers::formatArgs($code, $args);
 		return $this;
 	}
 
+
+	public function getBody(): string
+	{
+		return $this->body;
+	}
+
+
 	/**
-	 * @param  string
 	 * @return static
 	 */
-	public function addBody($code, array $args = null)
+	public function addBody(string $code, array $args = null): self
 	{
 		$this->body .= ($args === null ? $code : Helpers::formatArgs($code, $args)) . "\n";
 		return $this;
 	}
 
-	/**
-	 * @return Parameter[]
-	 */
-	public function getParameters()
-	{
-		return $this->parameters;
-	}
 
 	/**
-	 * @param  Parameter[]
+	 * @param  Parameter[]  $val
 	 * @return static
 	 */
-	public function setParameters(array $val)
+	public function setParameters(array $val): self
 	{
 		$this->parameters = [];
 		foreach ($val as $v) {
@@ -91,36 +84,55 @@ trait FunctionLike
 		return $this;
 	}
 
+
 	/**
-	 * @param  string  without $
-	 * @return Parameter
+	 * @return Parameter[]
 	 */
-	public function addParameter($name, $defaultValue = null)
+	public function getParameters(): array
+	{
+		return $this->parameters;
+	}
+
+
+	/**
+	 * @param  string  $name without $
+	 */
+	public function addParameter(string $name, $defaultValue = null): Parameter
 	{
 		$param = new Parameter($name);
 		if (func_num_args() > 1) {
-			$param->setOptional(true)->setDefaultValue($defaultValue);
+			$param->setDefaultValue($defaultValue);
 		}
 		return $this->parameters[$name] = $param;
 	}
 
+
 	/**
-	 * @return bool
+	 * @return static
 	 */
-	public function isVariadic()
+	public function setVariadic(bool $state = true): self
+	{
+		$this->variadic = $state;
+		return $this;
+	}
+
+
+	public function isVariadic(): bool
 	{
 		return $this->variadic;
 	}
 
+
 	/**
-	 * @param  bool
+	 * @param  string|null  $val
 	 * @return static
 	 */
-	public function setVariadic($state = true)
+	public function setReturnType($val): self
 	{
-		$this->variadic = (bool) $state;
+		$this->returnType = $val ? (string) $val : null;
 		return $this;
 	}
+
 
 	/**
 	 * @return string|null
@@ -130,66 +142,50 @@ trait FunctionLike
 		return $this->returnType;
 	}
 
+
 	/**
-	 * @param  string|null
 	 * @return static
 	 */
-	public function setReturnType($val)
+	public function setReturnReference(bool $state = true): self
 	{
-		$this->returnType = $val ? (string) $val : null;
+		$this->returnReference = $state;
 		return $this;
 	}
 
-	/**
-	 * @return bool
-	 */
-	public function getReturnReference()
+
+	public function getReturnReference(): bool
 	{
 		return $this->returnReference;
 	}
 
+
 	/**
-	 * @param  bool
 	 * @return static
 	 */
-	public function setReturnReference($state = true)
+	public function setReturnNullable(bool $state = true): self
 	{
-		$this->returnReference = (bool) $state;
+		$this->returnNullable = $state;
 		return $this;
 	}
 
-	/**
-	 * @return bool
-	 */
-	public function getReturnNullable()
+
+	public function getReturnNullable(): bool
 	{
 		return $this->returnNullable;
 	}
 
-	/**
-	 * @param  bool
-	 * @return static
-	 */
-	public function setReturnNullable($state = true)
-	{
-		$this->returnNullable = (bool) $state;
-		return $this;
-	}
 
 	/**
 	 * @return static
 	 */
-	public function setNamespace(PhpNamespace $val = null)
+	public function setNamespace(PhpNamespace $val = null): self
 	{
 		$this->namespace = $val;
 		return $this;
 	}
 
 
-	/**
-	 * @return string
-	 */
-	protected function parametersToString()
+	protected function parametersToString(): string
 	{
 		$params = [];
 		foreach ($this->parameters as $param) {
@@ -199,16 +195,13 @@ trait FunctionLike
 				. ($param->isReference() ? '&' : '')
 				. ($variadic ? '...' : '')
 				. '$' . $param->getName()
-				. ($param->hasDefaultValue() && !$variadic ? ' = ' . Helpers::dump($param->defaultValue) : '');
+				. ($param->hasDefaultValue() && !$variadic ? ' = ' . Helpers::dump($param->getDefaultValue()) : '');
 		}
 		return '(' . implode(', ', $params) . ')';
 	}
 
 
-	/**
-	 * @return string
-	 */
-	protected function returnTypeToString()
+	protected function returnTypeToString(): string
 	{
 		return $this->returnType
 			? ': ' . ($this->returnNullable ? '?' : '') . ($this->namespace ? $this->namespace->unresolveName($this->returnType) : $this->returnType)

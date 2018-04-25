@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\PhpGenerator;
 
 use Nette;
@@ -13,26 +15,27 @@ use Nette;
 /**
  * PHP code generator utils.
  */
-class Helpers
+final class Helpers
 {
 	use Nette\StaticClass;
 
 	const PHP_IDENT = '[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*';
+
 	const MAX_DEPTH = 50;
+
 	const WRAP_LENGTH = 70;
 
 
 	/**
 	 * Returns a PHP representation of a variable.
-	 * @return string
 	 */
-	public static function dump($var)
+	public static function dump($var): string
 	{
 		return self::_dump($var);
 	}
 
 
-	private static function _dump(&$var, $level = 0)
+	private static function _dump(&$var, int $level = 0)
 	{
 		if ($var instanceof PhpLiteral) {
 			return (string) $var;
@@ -104,7 +107,7 @@ class Helpers
 
 		} elseif (is_object($var)) {
 			$class = get_class($var);
-			if (PHP_VERSION_ID >= 70000 && (new \ReflectionObject($var))->isAnonymous()) {
+			if ((new \ReflectionObject($var))->isAnonymous()) {
 				throw new Nette\InvalidArgumentException('Cannot dump anonymous class.');
 
 			} elseif (in_array($class, ['DateTime', 'DateTimeImmutable'], true)) {
@@ -146,12 +149,20 @@ class Helpers
 		}
 	}
 
+
 	/**
 	 * Generates PHP statement.
-	 * @param  string
-	 * @return string
 	 */
-	public static function formatArgs($statement, array $args)
+	public static function format(string $statement, ...$args): string
+	{
+		return self::formatArgs($statement, $args);
+	}
+
+
+	/**
+	 * Generates PHP statement.
+	 */
+	public static function formatArgs(string $statement, array $args): string
 	{
 		$tokens = preg_split('#(\.\.\.\?|\$\?|->\?|::\?|\\\\\?|\?\*|\?)#', $statement, -1, PREG_SPLIT_DELIM_CAPTURE);
 		$res = '';
@@ -178,43 +189,25 @@ class Helpers
 				$res .= substr($token, 0, -1) . self::formatMember(array_shift($args));
 			}
 		}
+		if ($args) {
+			throw new Nette\InvalidArgumentException('Insufficient number of placeholders.');
+		}
 		return $res;
 	}
 
+
 	/**
 	 * Returns a PHP representation of a object member.
-	 * @return string
 	 */
-	public static function formatMember($name)
+	public static function formatMember($name): string
 	{
 		return $name instanceof PhpLiteral || !self::isIdentifier($name)
 			? '{' . self::_dump($name) . '}'
 			: $name;
 	}
 
-	/**
-	 * @return bool
-	 */
-	public static function isIdentifier($value)
-	{
-		return is_string($value) && preg_match('#^' . self::PHP_IDENT . '\z#', $value);
-	}
 
-	/**
-	 * Generates PHP statement.
-	 * @param  string
-	 * @return string
-	 */
-	public static function format($statement, ...$args)
-	{
-		return self::formatArgs($statement, $args);
-	}
-
-	/**
-	 * @param  string
-	 * @return string
-	 */
-	public static function formatDocComment($content)
+	public static function formatDocComment(string $content): string
 	{
 		if (($s = trim($content)) === '') {
 			return '';
@@ -225,19 +218,20 @@ class Helpers
 		}
 	}
 
-	/**
-	 * @param  string
-	 * @return string
-	 */
-	public static function unformatDocComment($comment)
+
+	public static function unformatDocComment(string $comment): string
 	{
 		return preg_replace('#^\s*\* ?#m', '', trim(trim(trim($comment), '/*')));
 	}
 
-	/**
-	 * @return bool
-	 */
-	public static function isNamespaceIdentifier($value, $allowLeadingSlash = false)
+
+	public static function isIdentifier($value): bool
+	{
+		return is_string($value) && preg_match('#^' . self::PHP_IDENT . '\z#', $value);
+	}
+
+
+	public static function isNamespaceIdentifier($value, bool $allowLeadingSlash = false): bool
 	{
 		$re = '#^' . ($allowLeadingSlash ? '\\\\?' : '') . self::PHP_IDENT . '(\\\\' . self::PHP_IDENT . ')*\z#';
 		return is_string($value) && preg_match($re, $value);
@@ -245,31 +239,22 @@ class Helpers
 
 
 	/**
-	 * @param  string
 	 * @return object
 	 * @internal
 	 */
-	public static function createObject($class, array $props)
+	public static function createObject(string $class, array $props)
 	{
-		return unserialize('O' . substr(serialize((string) $class), 1, -1) . substr(serialize($props), 1));
+		return unserialize('O' . substr(serialize($class), 1, -1) . substr(serialize($props), 1));
 	}
 
 
-	/**
-	 * @param  string
-	 * @return string
-	 */
-	public static function extractNamespace($name)
+	public static function extractNamespace(string $name): string
 	{
 		return ($pos = strrpos($name, '\\')) ? substr($name, 0, $pos) : '';
 	}
 
 
-	/**
-	 * @param  string
-	 * @return string
-	 */
-	public static function extractShortName($name)
+	public static function extractShortName(string $name): string
 	{
 		return ($pos = strrpos($name, '\\')) === false ? $name : substr($name, $pos + 1);
 	}

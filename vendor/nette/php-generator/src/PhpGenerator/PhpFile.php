@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\PhpGenerator;
 
 use Nette;
@@ -19,7 +21,7 @@ use Nette\Utils\Strings;
  * - doc comments
  * - one or more namespaces
  */
-class PhpFile
+final class PhpFile
 {
 	use Nette\SmartObject;
 	use Traits\CommentAware;
@@ -28,22 +30,31 @@ class PhpFile
 	private $namespaces = [];
 
 
-	/**
-	 * @param  string
-	 * @return ClassType
-	 */
-	public function addClass($name)
+	public function addClass(string $name): ClassType
 	{
 		return $this
 			->addNamespace(Helpers::extractNamespace($name))
 			->addClass(Helpers::extractShortName($name));
 	}
 
-	/**
-	 * @param  string null means global namespace
-	 * @return PhpNamespace
-	 */
-	public function addNamespace($name)
+
+	public function addInterface(string $name): ClassType
+	{
+		return $this
+			->addNamespace(Helpers::extractNamespace($name))
+			->addInterface(Helpers::extractShortName($name));
+	}
+
+
+	public function addTrait(string $name): ClassType
+	{
+		return $this
+			->addNamespace(Helpers::extractNamespace($name))
+			->addTrait(Helpers::extractShortName($name));
+	}
+
+
+	public function addNamespace(string $name): PhpNamespace
 	{
 		if (!isset($this->namespaces[$name])) {
 			$this->namespaces[$name] = new PhpNamespace($name);
@@ -51,35 +62,11 @@ class PhpFile
 		return $this->namespaces[$name];
 	}
 
-	/**
-	 * @param  string
-	 * @return ClassType
-	 */
-	public function addInterface($name)
-	{
-		return $this
-			->addNamespace(Helpers::extractNamespace($name))
-			->addInterface(Helpers::extractShortName($name));
-	}
 
-	/**
-	 * @param  string
-	 * @return ClassType
-	 */
-	public function addTrait($name)
-	{
-		return $this
-			->addNamespace(Helpers::extractNamespace($name))
-			->addTrait(Helpers::extractShortName($name));
-	}
-
-	/**
-	 * @return string PHP code
-	 */
-	public function __toString()
+	public function __toString(): string
 	{
 		foreach ($this->namespaces as $namespace) {
-			$namespace->setBracketedSyntax(count($this->namespaces) > 1 && isset($this->namespaces[null]));
+			$namespace->setBracketedSyntax(count($this->namespaces) > 1 && isset($this->namespaces['']));
 		}
 
 		return Strings::normalize(

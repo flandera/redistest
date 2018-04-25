@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\PhpGenerator;
 
 use Nette;
@@ -20,12 +22,12 @@ use Nette\Utils\Strings;
  * - variable amount of use statements
  * - one or more class declarations
  */
-class PhpNamespace
+final class PhpNamespace
 {
 	use Nette\SmartObject;
 
 	private static $keywords = [
-		'string' => 1, 'int' => 1, 'float' => 1, 'bool' => 1, 'array' => 1,
+		'string' => 1, 'int' => 1, 'float' => 1, 'bool' => 1, 'array' => 1, 'object' => 1,
 		'callable' => 1, 'iterable' => 1, 'void' => 1, 'self' => 1, 'parent' => 1,
 	];
 
@@ -41,117 +43,53 @@ class PhpNamespace
 	/** @var ClassType[] */
 	private $classes = [];
 
-	/**
-	 * @return string|null
-	 */
-	public function getName()
+
+	public function __construct(string $name)
 	{
-		return $this->name ?: null;
+		if ($name !== '' && !Helpers::isNamespaceIdentifier($name)) {
+			throw new Nette\InvalidArgumentException("Value '$name' is not valid name.");
+		}
+		$this->name = $name;
 	}
+
 
 	/** @deprecated */
 	public function setName($name)
 	{
+		trigger_error(__METHOD__ . '() is deprecated, use constructor.', E_USER_DEPRECATED);
 		$this->__construct($name);
 		return $this;
 	}
 
-	/**
-	 * @param  string|null
-	 */
-	public function __construct($name = null)
+
+	public function getName(): string
 	{
-		if ($name && !Helpers::isNamespaceIdentifier($name)) {
-			throw new Nette\InvalidArgumentException("Value '$name' is not valid name.");
-		}
-		$this->name = (string) $name;
+		return $this->name;
 	}
 
+
 	/**
-	 * @return bool
+	 * @return static
+	 * @internal
 	 */
-	public function getBracketedSyntax()
+	public function setBracketedSyntax(bool $state = true): self
+	{
+		$this->bracketedSyntax = $state;
+		return $this;
+	}
+
+
+	public function getBracketedSyntax(): bool
 	{
 		return $this->bracketedSyntax;
 	}
 
-	/**
-	 * @param  bool
-	 * @return static
-	 * @internal
-	 */
-	public function setBracketedSyntax($state = true)
-	{
-		$this->bracketedSyntax = (bool) $state;
-		return $this;
-	}
 
 	/**
-	 * @return string[]
-	 */
-	public function getUses()
-	{
-		return $this->uses;
-	}
-
-	/**
-	 * @param  string
-	 * @return string
-	 */
-	public function unresolveName($name)
-	{
-		if (isset(self::$keywords[strtolower($name)]) || $name === '') {
-			return $name;
-		}
-		$name = ltrim($name, '\\');
-		$res = null;
-		$lower = strtolower($name);
-		foreach ($this->uses as $alias => $for) {
-			if (Strings::startsWith($lower . '\\', strtolower($for) . '\\')) {
-				$short = $alias . substr($name, strlen($for));
-				if (!isset($res) || strlen($res) > strlen($short)) {
-					$res = $short;
-				}
-			}
-		}
-
-		if (!$res && Strings::startsWith($lower, strtolower($this->name) . '\\')) {
-			return substr($name, strlen($this->name) + 1);
-		} else {
-			return $res ?: ($this->name ? '\\' : '') . $name;
-		}
-	}
-
-	/**
-	 * @param  string
-	 * @return ClassType
-	 */
-	public function addInterface($name)
-	{
-		return $this->addClass($name)->setType(ClassType::TYPE_INTERFACE);
-	}
-
-	/**
-	 * @param  string
-	 * @return ClassType
-	 */
-	public function addClass($name)
-	{
-		if (!isset($this->classes[$name])) {
-			$this->addUse($this->name . '\\' . $name);
-			$this->classes[$name] = new ClassType($name, $this);
-		}
-		return $this->classes[$name];
-	}
-
-	/**
-	 * @param  string
-	 * @param  string
-	 * @param  string
 	 * @throws InvalidStateException
 	 * @return static
 	 */
-	public function addUse($name, $alias = null, &$aliasOut = null)
+	public function addUse(string $name, string $alias = null, string &$aliasOut = null): self
 	{
 		$name = ltrim($name, '\\');
 		if ($alias === null && $this->name === Helpers::extractNamespace($name)) {
@@ -180,11 +118,59 @@ class PhpNamespace
 		return $this;
 	}
 
+
 	/**
-	 * @param  string
-	 * @return ClassType
+	 * @return string[]
 	 */
-	public function addTrait($name)
+	public function getUses(): array
+	{
+		return $this->uses;
+	}
+
+
+	public function unresolveName(string $name): string
+	{
+		if (isset(self::$keywords[strtolower($name)]) || $name === '') {
+			return $name;
+		}
+		$name = ltrim($name, '\\');
+		$res = null;
+		$lower = strtolower($name);
+		foreach ($this->uses as $alias => $for) {
+			if (Strings::startsWith($lower . '\\', strtolower($for) . '\\')) {
+				$short = $alias . substr($name, strlen($for));
+				if (!isset($res) || strlen($res) > strlen($short)) {
+					$res = $short;
+				}
+			}
+		}
+
+		if (!$res && Strings::startsWith($lower, strtolower($this->name) . '\\')) {
+			return substr($name, strlen($this->name) + 1);
+		} else {
+			return $res ?: ($this->name ? '\\' : '') . $name;
+		}
+	}
+
+
+	public function addClass(string $name): ClassType
+	{
+		if (isset($this->classes[$name])) {
+			trigger_error(__METHOD__ . "() class $name was already added.", E_USER_DEPRECATED);
+			return $this->classes[$name];
+		}
+		$this->addUse($this->name . '\\' . $name);
+		return $this->classes[$name] = new ClassType($name, $this);
+	}
+
+
+	public function addInterface(string $name): ClassType
+	{
+		return $this->addClass($name)->setType(ClassType::TYPE_INTERFACE);
+	}
+
+
+	public function addTrait(string $name): ClassType
 	{
 		return $this->addClass($name)->setType(ClassType::TYPE_TRAIT);
 	}
@@ -193,16 +179,13 @@ class PhpNamespace
 	/**
 	 * @return ClassType[]
 	 */
-	public function getClasses()
+	public function getClasses(): array
 	{
 		return $this->classes;
 	}
 
 
-	/**
-	 * @return string PHP code
-	 */
-	public function __toString()
+	public function __toString(): string
 	{
 		$uses = [];
 		asort($this->uses);

@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\PhpGenerator;
 
 use Nette;
@@ -13,15 +15,18 @@ use Nette;
 /**
  * Class method.
  *
- * @property string|false $body
+ * @property string|null $body
  */
-class Method
+final class Method
 {
 	use Nette\SmartObject;
 	use Traits\FunctionLike;
 	use Traits\NameAware;
 	use Traits\VisibilityAware;
 	use Traits\CommentAware;
+
+	/** @var string|null */
+	private $body = '';
 
 	/** @var bool */
 	private $static = false;
@@ -32,37 +37,32 @@ class Method
 	/** @var bool */
 	private $abstract = false;
 
+
 	/**
-	 * @param  string
+	 * @param  string|array  $method
+	 * @return static
 	 */
-	public function __construct($name)
+	public static function from($method): self
 	{
-		if ($name === null) {
-			throw new Nette\DeprecatedException('For closures use Nette\PhpGenerator\Closure instead of Nette\PhpGenerator\Method.');
-		} elseif (!Helpers::isIdentifier($name)) {
+		if ($method instanceof \ReflectionMethod) {
+			trigger_error(__METHOD__ . '() accepts only method name.', E_USER_DEPRECATED);
+		} else {
+			$method = Nette\Utils\Callback::toReflection($method);
+		}
+		return (new Factory)->fromMethodReflection($method);
+	}
+
+
+	public function __construct(string $name)
+	{
+		if (!Helpers::isIdentifier($name)) {
 			throw new Nette\InvalidArgumentException("Value '$name' is not valid name.");
 		}
 		$this->name = $name;
 	}
 
-	/**
-	 * @param  callable
-	 * @return static
-	 */
-	public static function from($method)
-	{
-		$method = $method instanceof \ReflectionFunctionAbstract ? $method : Nette\Utils\Callback::toReflection($method);
-		if ($method instanceof \ReflectionFunction) {
-			trigger_error('For global functions or closures use Nette\PhpGenerator\GlobalFunction or Nette\PhpGenerator\Closure.', E_USER_DEPRECATED);
-			return (new Factory)->fromFunctionReflection($method);
-		}
-		return (new Factory)->fromMethodReflection($method);
-	}
 
-	/**
-	 * @return string  PHP code
-	 */
-	public function __toString()
+	public function __toString(): string
 	{
 		return Helpers::formatDocComment($this->comment . "\n")
 			. ($this->abstract ? 'abstract ' : '')
@@ -74,82 +74,80 @@ class Method
 			. $this->name
 			. $this->parametersToString()
 			. $this->returnTypeToString()
-			. ($this->abstract || $this->body === false
+			. ($this->abstract || $this->body === null
 				? ';'
 				: "\n{\n" . Nette\Utils\Strings::indent(ltrim(rtrim($this->body) . "\n"), 1) . '}');
 	}
 
 
 	/**
-	 * @param  string|false
+	 * @param  string|null  $code
 	 * @return static
 	 */
-	public function setBody($code, array $args = null)
+	public function setBody($code, array $args = null): self
 	{
-		$this->body = $args === null ? $code : Helpers::formatArgs($code, $args);
+		if ($code === false) {
+			$code = null;
+			trigger_error(__METHOD__ . '() use null instead of false', E_USER_DEPRECATED);
+		}
+		$this->body = $args === null || $code === null ? $code : Helpers::formatArgs($code, $args);
 		return $this;
 	}
 
 
 	/**
-	 * @return string|false
+	 * @return string|null
 	 */
 	public function getBody()
 	{
 		return $this->body;
 	}
 
+
 	/**
-	 * @return bool
+	 * @return static
 	 */
-	public function isStatic()
+	public function setStatic(bool $state = true): self
+	{
+		$this->static = $state;
+		return $this;
+	}
+
+
+	public function isStatic(): bool
 	{
 		return $this->static;
 	}
 
+
 	/**
-	 * @param  bool
 	 * @return static
 	 */
-	public function setStatic($state = true)
+	public function setFinal(bool $state = true): self
 	{
-		$this->static = (bool) $state;
+		$this->final = $state;
 		return $this;
 	}
 
-	/**
-	 * @return bool
-	 */
-	public function isFinal()
+
+	public function isFinal(): bool
 	{
 		return $this->final;
 	}
 
+
 	/**
-	 * @param  bool
 	 * @return static
 	 */
-	public function setFinal($state = true)
+	public function setAbstract(bool $state = true): self
 	{
-		$this->final = (bool) $state;
+		$this->abstract = $state;
 		return $this;
 	}
 
-	/**
-	 * @return bool
-	 */
-	public function isAbstract()
+
+	public function isAbstract(): bool
 	{
 		return $this->abstract;
-	}
-
-	/**
-	 * @param  bool
-	 * @return static
-	 */
-	public function setAbstract($state = true)
-	{
-		$this->abstract = (bool) $state;
-		return $this;
 	}
 }

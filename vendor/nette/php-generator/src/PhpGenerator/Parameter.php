@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\PhpGenerator;
 
 use Nette;
@@ -12,14 +14,13 @@ use Nette;
 
 /**
  * Method parameter description.
+ *
+ * @property mixed $defaultValue
  */
-class Parameter
+final class Parameter
 {
 	use Nette\SmartObject;
 	use Traits\NameAware;
-
-	/** @var mixed */
-	public $defaultValue;
 
 	/** @var bool */
 	private $reference = false;
@@ -33,34 +34,36 @@ class Parameter
 	/** @var bool */
 	private $hasDefaultValue = false;
 
+	/** @var mixed */
+	private $defaultValue;
+
 
 	/**
-	 * @deprecated
 	 * @return static
 	 */
-	public static function from(\ReflectionParameter $from)
+	public function setReference(bool $state = true): self
 	{
-		trigger_error(__METHOD__ . '() is deprecated, use Nette\PhpGenerator\Factory.', E_USER_DEPRECATED);
-		return (new Factory)->fromParameterReflection($from);
+		$this->reference = $state;
+		return $this;
 	}
 
-	/**
-	 * @return bool
-	 */
-	public function isReference()
+
+	public function isReference(): bool
 	{
 		return $this->reference;
 	}
 
+
 	/**
-	 * @param  bool
+	 * @param  string|null  $hint
 	 * @return static
 	 */
-	public function setReference($state = true)
+	public function setTypeHint($hint): self
 	{
-		$this->reference = (bool) $state;
+		$this->typeHint = $hint ? (string) $hint : null;
 		return $this;
 	}
+
 
 	/**
 	 * @return string|null
@@ -70,75 +73,62 @@ class Parameter
 		return $this->typeHint;
 	}
 
-	/**
-	 * @param  string|null
-	 * @return static
-	 */
-	public function setTypeHint($hint)
-	{
-		$this->typeHint = $hint ? (string) $hint : null;
-		return $this;
-	}
 
 	/**
-	 * @param  bool
+	 * @deprecated  just use setDefaultValue()
 	 * @return static
 	 */
-	public function setOptional($state = true)
+	public function setOptional(bool $state = true): self
 	{
-		$this->hasDefaultValue = (bool) $state;
+		$this->hasDefaultValue = $state;
 		return $this;
 	}
 
 
 	/**
 	 * @deprecated  use hasDefaultValue()
-	 * @return bool
 	 */
-	public function isOptional()
+	public function isOptional(): bool
 	{
+		trigger_error(__METHOD__ . '() is deprecated, use hasDefaultValue()', E_USER_DEPRECATED);
 		return $this->hasDefaultValue;
 	}
 
+
 	/**
-	 * @return bool
+	 * @return static
 	 */
-	public function isNullable()
+	public function setNullable(bool $state = true): self
+	{
+		$this->nullable = $state;
+		return $this;
+	}
+
+
+	public function isNullable(): bool
 	{
 		return $this->nullable;
 	}
 
+
 	/**
-	 * @param  bool
 	 * @return static
 	 */
-	public function setNullable($state = true)
+	public function setDefaultValue($val): self
 	{
-		$this->nullable = (bool) $state;
+		$this->defaultValue = $val;
+		$this->hasDefaultValue = true;
 		return $this;
 	}
 
-	/**
-	 * @return mixed
-	 */
+
 	public function getDefaultValue()
 	{
 		return $this->defaultValue;
 	}
 
-	/**
-	 * @return static
-	 */
-	public function setDefaultValue($val)
-	{
-		$this->defaultValue = $val;
-		return $this;
-	}
 
-	/**
-	 * @return bool
-	 */
-	public function hasDefaultValue()
+	public function hasDefaultValue(): bool
 	{
 		return $this->hasDefaultValue;
 	}

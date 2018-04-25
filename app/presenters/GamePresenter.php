@@ -10,8 +10,14 @@ use Nette\Http\IResponse;
 
 class GamePresenter extends BasePresenter
 {
+	/**
+	 * @var array
+	 */
 	private $allowedParameters = ['game_id', 'score', 'user_id'];
 
+	/**
+	 * @var \Kdyby\Redis\RedisClient
+	 */
 	private $redis;
 
 	public function __construct(RedisClient $client)
@@ -27,7 +33,6 @@ class GamePresenter extends BasePresenter
 
 	public function actionStoreGame()
 	{
-
 		$values = $this->request->getParameters();
 		unset($values['action']);
 		$validRequest = $this->validateValues($values);
@@ -36,20 +41,31 @@ class GamePresenter extends BasePresenter
 		}else{
 			try {
 				$this->saveGame($values);
-			} catch (Exception $e) {
+			} catch (\Exception $e) {
 				return $this->sendJson(['status' => IResponse::S500_INTERNAL_SERVER_ERROR, 'message' => 'Error in saving game']);
 			}
 			return $this->sendJson(['status' => IResponse::S200_OK, 'message' => 'Game saved']);
 		}
-		Debugger::barDump($values);
 	}
 
+	/**
+	 * @throws \Nette\Application\AbortException
+	 * @return \Nette\Application\Responses\JsonResponse
+	 */
 	public function actionGetTopGamers()
 	{
-		$gamers = $this->redis->zRange('gamers', 0, 9);
+		try {
+			$gamers = $this->redis->zRevRange('gamers', 0, 9);
+		} catch (\Exception $e) {
+			return $this->sendJson(['status' => IResponse::S500_INTERNAL_SERVER_ERROR, 'message' => 'Error in loading data']);
+		}
 		return $this->sendJson(['status'=>IResponse::S200_OK, 'message'=>$gamers]);
 	}
 
+	/**
+	 * @param array $values
+	 * @return bool
+	 */
 	protected function validateValues($values)
 	{
 		$validRequest = TRUE;
@@ -67,10 +83,21 @@ class GamePresenter extends BasePresenter
 		return $validRequest;
 	}
 
+	/**
+	 * @param array $values
+	 */
 	protected function saveGame($values)
 	{
 		$this->redis->zAdd('gamers', $values['score'], $values['user_id']);
 		$this->redis->persist('gamers');
 		$this->redis->save();
+	}
+
+	/**
+	 * @return \Kdyby\Redis\RedisClient
+	 */
+	public function getRedis()
+	{
+		return $this->redis;
 	}
 }

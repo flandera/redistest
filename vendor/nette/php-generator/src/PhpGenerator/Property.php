@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\PhpGenerator;
 
 use Nette;
@@ -12,8 +14,10 @@ use Nette;
 
 /**
  * Class property description.
+ *
+ * @property mixed $value
  */
-class Property
+final class Property
 {
 	use Nette\SmartObject;
 	use Traits\NameAware;
@@ -21,54 +25,40 @@ class Property
 	use Traits\CommentAware;
 
 	/** @var mixed */
-	public $value;
+	private $value;
 
 	/** @var bool */
 	private $static = false;
 
 
 	/**
-	 * @deprecated
 	 * @return static
 	 */
-	public static function from(\ReflectionProperty $from)
-	{
-		trigger_error(__METHOD__ . '() is deprecated, use Nette\PhpGenerator\Factory.', E_USER_DEPRECATED);
-		return (new Factory)->fromPropertyReflection($from);
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getValue()
-	{
-		return $this->value;
-	}
-
-	/**
-	 * @return static
-	 */
-	public function setValue($val)
+	public function setValue($val): self
 	{
 		$this->value = $val;
 		return $this;
 	}
 
-	/**
-	 * @return bool
-	 */
-	public function isStatic()
+
+	public function &getValue()
 	{
-		return $this->static;
+		return $this->value;
 	}
 
+
 	/**
-	 * @param  bool
 	 * @return static
 	 */
-	public function setStatic($state = true)
+	public function setStatic(bool $state = true): self
 	{
-		$this->static = (bool) $state;
+		$this->static = $state;
 		return $this;
+	}
+
+
+	public function isStatic(): bool
+	{
+		return $this->static;
 	}
 }
