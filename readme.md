@@ -20,8 +20,3 @@ http://localhost:8085/game/storegame?game_id=100&user_id=10&score=1000
 top 10 gamers by score:
 http://localhost:8085/game/gettopgamers
 
-
-License
--------
-- Nette: New BSD License or GPL 2.0 or 3.0
-- Adminer: Apache License 2.0 or GPL 2
