@@ -1,4 +1,4 @@
-[![build status](https://gitlab.wunderman3.vshosting.cz/fischer/mailing-machine/badges/dev/build.svg)](https://gitlab.wunderman3.vshosting.cz/fischer/mailing-machine/commits/dev) [![coverage report](https://gitlab.wunderman3.vshosting.cz/fischer/mailing-machine/badges/dev/coverage.svg)](https://gitlab.wunderman3.vshosting.cz/fischer/mailing-machine/commits/dev)
+[![Build Status](https://travis-ci.org/flandera/redistest.svg?branch=master)](https://travis-ci.org/flandera/redistest)
 
 Redis test app
 =============
